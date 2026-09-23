@@ -321,7 +321,6 @@
   const cd = $("[data-cart-dialog]");
   $("[data-cart-title]", cd).textContent = T.cartTitle;
   $("[data-cart-empty]", cd).textContent = T.cartEmpty;
-  $("[data-send-label]", cd).textContent = T.cartSend;
   $("[data-pill-label]").textContent = T.pill;
 
   const TRASH = '<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>';
@@ -374,8 +373,6 @@
       })
       .join("");
     $("[data-cart-empty]", cd).hidden = n > 0;
-    $("[data-cart-form]", cd).hidden = n === 0;
-    $("[data-cart-foot]", cd).hidden = n === 0;
     $("[data-fallback]", cd).hidden = true;
     $("[data-cart-done]", cd).hidden = true;
   }
@@ -441,11 +438,44 @@
     else if (ok) location.href = D.dm; // ventana bloqueada: se abre en la misma pestaña (el pedido queda guardado)
   }
 
-  $("[data-send]", cd).addEventListener("click", () => {
-    if (!validClient()) return;
-    sendToDm(message(), T.copied, $("[data-fallback]", cd));
+  /* Envío del pedido. Con número de WhatsApp (D.whatsapp) el chat se abre con el
+     mensaje ya escrito, como en Fullfardo. Sin número, va por Instagram, que no
+     permite precargar texto: se copia y el cliente lo pega. */
+  const WA = String(D.whatsapp || "").replace(/\D/g, "");
+  const sendBtn = $("[data-send]", cd);
+  sendBtn.classList.toggle("btn-wa", !!WA);
+  $("[data-ic-wa]", cd).toggleAttribute("hidden", !WA); // en SVG, .hidden no existe: va como atributo
+  $("[data-ic-ig]", cd).toggleAttribute("hidden", !!WA);
+  const sendLabel = WA ? T.cartSendWa : T.cartSend;
+  $("[data-send-label]", cd).textContent = sendLabel;
+
+  const showDone = (msg, err) => {
     const done = $("[data-cart-done]", cd);
-    done.textContent = T.cartDone; done.hidden = false;
+    done.textContent = msg; done.hidden = false;
+    done.toggleAttribute("data-err", !!err);
+  };
+
+  sendBtn.addEventListener("click", () => {
+    if (!cart.length) { showDone(T.cartEmptyErr, true); return; }
+    if (!validClient()) return;
+    const text = message();
+    let copied = true;
+    if (!WA) {
+      // la copia tiene que ser sincrónica, antes de abrir otra pestaña
+      copied = copySync(text);
+      if (!copied) { const fb = $("[data-fallback]", cd); fb.value = text; fb.hidden = false; fb.select(); }
+    }
+    const url = WA ? `https://wa.me/${WA}?text=${encodeURIComponent(text)}` : D.dm;
+    // la pestaña se abre ya (así el navegador no la bloquea) y carga el chat tras «Invio in corso…»
+    const win = window.open("", "_blank");
+    sendBtn.disabled = true;
+    $("[data-send-label]", cd).textContent = T.sending;
+    setTimeout(() => {
+      if (win) { win.opener = null; win.location.href = url; } else location.href = url;
+      sendBtn.disabled = false;
+      $("[data-send-label]", cd).textContent = sendLabel;
+      showDone(WA ? T.cartDoneWa : copied ? T.cartDone : T.copyFail);
+    }, 900);
   });
 
   /* ---------- aperturas y cierres ---------- */

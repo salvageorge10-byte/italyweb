@@ -5,6 +5,9 @@ window.IS7 = {
   instagram: "https://www.instagram.com/italyshop_7/",
   dm: "https://ig.me/m/italyshop_7",
   handle: "@italyshop_7",
+  // Numero WhatsApp di Francesco con prefisso internazionale (es. "393331234567").
+  // Se è vuoto, gli ordini vanno su Instagram.
+  whatsapp: "",
 
   ui: {
     price: "Prezzo in DM",
@@ -24,6 +27,10 @@ window.IS7 = {
     cartEmpty: "Non hai ancora aggiunto niente. Scegli un articolo dal catalogo e lo ritrovi qui.",
     cartNote: "Sul sito non si paga niente. Mandi questo ordine in DM e Francesco ti risponde con prezzo, taglie disponibili e spedizione.",
     cartSend: "Conferma su Instagram",
+    cartSendWa: "Conferma su WhatsApp",
+    sending: "Invio dell'ordine…",
+    cartEmptyErr: "Aggiungi almeno un articolo all'ordine.",
+    cartDoneWa: "Si è aperto WhatsApp con l'ordine già scritto: tocca «Invia».",
     cartClear: "Svuota l'ordine",
     remove: "Rimuovi",
     copied: "Ordine copiato. Incollalo nella chat di Instagram che si è appena aperta.",
