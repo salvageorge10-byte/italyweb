@@ -463,19 +463,23 @@
     if (!WA) {
       // la copia tiene que ser sincrónica, antes de abrir otra pestaña
       copied = copySync(text);
-      if (!copied) { const fb = $("[data-fallback]", cd); fb.value = text; fb.hidden = false; fb.select(); }
+      // segunda vía de copia (iPhone y navegadores nuevos), dentro del mismo toque
+      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+      if (!copied && !navigator.clipboard) { const fb = $("[data-fallback]", cd); fb.value = text; fb.hidden = false; fb.select(); }
     }
     const url = WA ? `https://wa.me/${WA}?text=${encodeURIComponent(text)}` : D.dm;
-    // la pestaña se abre ya (así el navegador no la bloquea) y carga el chat tras «Invio in corso…»
-    const win = window.open("", "_blank");
-    sendBtn.disabled = true;
+    // El chat se abre en el mismo toque, como un enlace normal: en el celular es lo
+    // único que garantiza que se abra la app. «Invio dell'ordine…» es solo el aviso.
+    const win = window.open(url, "_blank");
+    if (win) win.opener = null;
+    else location.href = url; // ventana bloqueada: se abre en la misma pestaña (el pedido queda guardado)
     $("[data-send-label]", cd).textContent = T.sending;
+    sendBtn.classList.add("is-sending");
+    showDone(WA ? T.cartDoneWa : copied || navigator.clipboard ? T.cartDone : T.copyFail);
     setTimeout(() => {
-      if (win) { win.opener = null; win.location.href = url; } else location.href = url;
-      sendBtn.disabled = false;
       $("[data-send-label]", cd).textContent = sendLabel;
-      showDone(WA ? T.cartDoneWa : copied ? T.cartDone : T.copyFail);
-    }, 900);
+      sendBtn.classList.remove("is-sending");
+    }, 2500);
   });
 
   /* ---------- aperturas y cierres ---------- */

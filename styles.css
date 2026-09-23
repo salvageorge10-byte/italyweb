@@ -755,7 +755,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .btn-ig:hover { filter: brightness(1.08); }
 .btn-ig svg[hidden] { display: none; }
 .btn-ig.btn-wa { background: #25d366; }
-.btn-ig[disabled] { cursor: progress; filter: saturate(.7) brightness(.95); }
+.btn-ig.is-sending { filter: saturate(.7) brightness(.95); }
 .cart-done[data-err] { color: var(--c-alert); }
 .btn-ig:active { transform: translateY(1px); }
 .cart-done { margin-top: 14px; font-size: 14px; line-height: 1.45; color: var(--c-text); text-align: center; }
