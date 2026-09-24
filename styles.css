@@ -316,41 +316,77 @@ ul, ol { padding: 0; list-style: none; }
   margin: var(--mt) 0 0;
   min-width: 0;
 }
+/* Pieza del catálogo: la foto manda. Marco sin bordes, segunda foto al pasar el
+   mouse, «Aggiungi» flotando dentro de la foto y ficha de texto corta debajo. */
+.item-frame { position: relative; }
 .item-media {
+  position: relative;
   display: block; width: 100%;
   aspect-ratio: var(--ratio, 4/5);
-  max-height: min(70vh, 600px);
+  max-height: min(72vh, 620px);
   overflow: hidden;
   background: var(--paper-2);
 }
 .item-media img {
+  position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
-  transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+  transition: transform .9s cubic-bezier(.2, .7, .2, 1), opacity .5s ease;
 }
-.item-media:hover img { transform: scale(1.025); }
+.item-media img.alt { opacity: 0; }
+.item-media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .06);
+}
+@media (hover: hover) {
+  .item-frame:hover .item-media img { transform: scale(1.035); }
+  .item-frame:hover .item-media.has-alt img:not(.alt) { opacity: 0; }
+  .item-frame:hover .item-media.has-alt img.alt { opacity: 1; }
+}
 
-.cap {
-  display: flex; flex-wrap: wrap; align-items: baseline;
-  gap: 2px 10px;
-  padding-top: 10px;
-  font-size: 14px; line-height: 1.35;
+.item-tag {
+  position: absolute; left: 12px; top: 12px;
+  padding: 5px 9px 4px;
+  background: rgba(244, 243, 239, .92); color: var(--ink);
+  font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  pointer-events: none;
 }
+.item-quick {
+  position: absolute; right: 12px; bottom: 12px;
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 14px 0 12px;
+  background: var(--paper); color: var(--ink);
+  border-radius: 999px;
+  font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .14);
+  transition: opacity .25s ease, transform .25s ease, background-color .15s ease, color .15s ease;
+}
+.item-quick:hover { background: var(--ink); color: var(--paper); }
+.item-quick[data-in] { background: var(--ink); color: var(--paper); }
+.item-quick[data-in] svg { display: none; }
+.item-quick[data-in] span { font-size: 0; }
+.item-quick[data-in] span::after { content: "Aggiunto \2713"; font-size: 12px; }
+@media (hover: hover) {
+  .item-quick:not([data-in]) { opacity: 0; transform: translateY(6px); }
+  .item-frame:hover .item-quick, .item-quick:focus-visible { opacity: 1; transform: none; }
+}
+
+.cap { display: grid; gap: 3px; padding-top: 14px; }
 .cap-brand {
-  font-family: var(--mono); font-size: 11px; font-weight: 500;
-  letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
-  flex-basis: 100%;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
 }
-.cap-name { font-weight: 600; text-align: left; }
-.cap-name:hover { text-decoration: underline; text-underline-offset: 3px; }
-.cap-add {
-  margin-left: auto;
-  font-size: 13px; font-weight: 600; color: var(--accent);
-  white-space: nowrap;
-  padding: 4px 0;
+.cap-name {
+  justify-self: start; text-align: left;
+  font-size: 15.5px; font-weight: 600; line-height: 1.3; letter-spacing: -.005em;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size .25s ease;
 }
-.cap-add:hover { text-decoration: underline; text-underline-offset: 3px; }
-.cap-add[data-in] { color: var(--ink); }
-.cap-add[data-in]::after { content: " \2713"; }
+.cap-name:hover { background-size: 100% 1px; }
+.cap-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 5px; }
+.cap-price { font-size: 13px; color: var(--muted); }
+.cap-dots { display: inline-flex; align-items: center; gap: 5px; }
+.cap-dots i { width: 11px; height: 11px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2); }
+.cap-dots em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 2px; }
 
 .item--note { align-self: start; max-width: 520px; }
 .note-title {
@@ -371,9 +407,9 @@ ul, ol { padding: 0; list-style: none; }
 }
 .look--dark .look-note { color: var(--night-muted); }
 .look--dark .item-media { background: var(--night-2); }
-.look--dark .cap-brand { color: var(--night-muted); }
-.look--dark .cap-add { color: var(--accent-light); }
-.look--dark .cap-add[data-in] { color: #fff; }
+.look--dark .item-media::after { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
+.look--dark .cap-brand, .look--dark .cap-price, .look--dark .cap-dots em { color: var(--night-muted); }
+.look--dark .cap-dots i { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
 .look--dark + .look { padding-top: var(--s8); }
 
 /* ---------- cómo se compra ---------- */
@@ -858,8 +894,20 @@ html:has(dialog[open]) { overflow: hidden; }
     column-gap: 10px; row-gap: var(--s6);
   }
   .item { grid-column: var(--m); grid-row: auto; margin-top: var(--mm); }
-  .item-media { max-height: 260px; }
-  .cap { font-size: 13.5px; }
+  .item-media { max-height: 280px; }
+  /* en el celular «Aggiungi» queda como un botón redondo con el signo + */
+  .item-quick { right: 8px; bottom: 8px; width: 34px; height: 34px; padding: 0; justify-content: center; }
+  .item-quick, .item-quick:not([data-in]) { opacity: 1; transform: none; }
+  .item-quick span { display: none; }
+  .item-quick[data-in] span { display: block; }
+  .item-quick[data-in] span::after { content: "\2713"; font-size: 15px; letter-spacing: 0; }
+  .item-tag { left: 8px; top: 8px; font-size: 9px; padding: 4px 6px 3px; }
+  .cap { padding-top: 10px; gap: 2px; }
+  .cap-brand { font-size: 9.5px; }
+  .cap-name { font-size: 13.5px; }
+  .cap-foot { margin-top: 3px; }
+  .cap-price { font-size: 12px; }
+  .cap-dots i { width: 9px; height: 9px; }
   .item--note { margin-top: var(--s3); }
   .note-title { font-size: 40px; }
   .look--dark { margin-top: var(--s8); padding-bottom: var(--s8); }

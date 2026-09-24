@@ -11,6 +11,7 @@ window.IS7 = {
 
   ui: {
     price: "Prezzo in DM",
+    anyTag: "Qualsiasi taglia",
     add: "Aggiungi all'ordine",
     added: "Aggiunto all'ordine",
     ask: "Chiedi su Instagram",

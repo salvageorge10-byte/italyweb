@@ -50,15 +50,34 @@
     return `--c:${l.c || "auto"};--r:${l.r || "auto"};--mt:${l.mt || 0}px;--m:${l.m || "1 / span 6"};--mm:${l.mm || 0}px;${l.ratio ? `--ratio:${l.ratio};` : ""}`;
   };
 
+  // muestras de color reales de cada pieza (las mismas de la ficha)
+  const dots = (p) => {
+    const cs = p.colors || [];
+    return cs.slice(0, 4).map((c) => {
+      const v = D.swatches[c];
+      const bg = Array.isArray(v) ? `linear-gradient(135deg, ${v[0]} 50%, ${v[1]} 50%)` : v || "#ccc";
+      return `<i style="background:${bg}" title="${esc(c)}"></i>`;
+    }).join("") + (cs.length > 4 ? `<em>+${cs.length - 4}</em>` : "");
+  };
+  const PLUS = '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+
   const item = (p, sizes) => `
     <figure class="item" style="${pos(p.id)}">
-      <button class="item-media" type="button" data-product="${p.id}" aria-label="Vedi scheda: ${esc(p.brand)} ${esc(p.name)}">
-        ${imgTag(p, p.imgs[0], sizes, altFor(p))}
-      </button>
+      <div class="item-frame">
+        <button class="item-media${p.imgs[1] ? " has-alt" : ""}" type="button" data-product="${p.id}" aria-label="Vedi scheda: ${esc(fullName(p))}">
+          ${imgTag(p, p.imgs[0], sizes, altFor(p))}
+          ${p.imgs[1] ? imgTag(p, p.imgs[1], sizes, "").replace("<img ", '<img class="alt" ') : ""}
+        </button>
+        ${p.any ? `<span class="item-tag">${T.anyTag}</span>` : ""}
+        <button class="item-quick" type="button" data-quick="${p.id}" aria-label="Aggiungi ${esc(fullName(p))} all'ordine">${PLUS}<span>Aggiungi</span></button>
+      </div>
       <figcaption class="cap">
         <span class="cap-brand">${esc(p.brand)}</span>
         <button class="cap-name" type="button" data-product="${p.id}">${esc(p.name)}</button>
-        <button class="cap-add" type="button" data-quick="${p.id}" aria-label="Aggiungi ${esc(p.brand)} ${esc(p.name)} all'ordine">+ Aggiungi</button>
+        <span class="cap-foot">
+          <span class="cap-price">${T.price}</span>
+          <span class="cap-dots" aria-label="${(p.colors || []).length} ${(p.colors || []).length === 1 ? "colore" : "colori"}">${dots(p)}</span>
+        </span>
       </figcaption>
     </figure>`;
 
